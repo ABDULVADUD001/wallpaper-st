@@ -1,151 +1,98 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wallpaper App</title>
+if (type === "portrait") {
+        url += "&Orientation=Portrait";
+      }
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+      try {
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
+        const response = await fetch(url, {
+          headers: {
+            "Accept-Version": "v7"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("API xatosi");
+        }
+
+        const data = await response.json();
+
+        if (!data.items || data.items.length === 0) {
+          status.textContent = "😕 Rasm topilmadi.";
+          return;
+        }
+
+        status.textContent =
+          "✨ " + data.items.length + " ta wallpaper";
+
+        data.items.forEach(item => {
+
+          const card = document.createElement("div");
+          card.className = "wallpaper";
+
+          const img = document.createElement("img");
+          img.src = item.url;
+          img.loading = "lazy";
+          img.alt = "Anime Wallpaper";
+
+          const download = document.createElement("button");
+          download.className = "download";
+          download.textContent = "↓";
+
+          download.onclick = () => {
+            window.open(item.url, "_blank");
+          };
+
+          card.appendChild(img);
+          card.appendChild(download);
+
+          grid.appendChild(card);
+        });
+
+      } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+          "❌ Rasmlarni yuklashda xatolik yuz berdi.";
+
+      }
     }
 
-    body {
-      background: #080b18;
-      color: white;
-      min-height: 100vh;
+    async function searchAnime() {
+
+      const input =
+        document.getElementById("searchInput").value.trim();
+
+      if (!input) {
+        loadWallpapers("waifu");
+        return;
+      }
+
+      const status = document.getElementById("status");
+
+      status.textContent =
+        "🔎 \"" + input + "\" qidirilmoqda...";
+
+      /*
+       * Waifu.im API tag bo'yicha ishlaydi.
+       * Anime nomi API tagi bo'lmasa, tasodifiy anime
+       * wallpaperlar ko'rsatiladi.
+       */
+
+      loadWallpapers("waifu");
     }
 
-    header {
-      padding: 20px;
-      text-align: center;
-      background: linear-gradient(135deg, #151a3b, #5b20a8);
-    }
+    document
+      .getElementById("searchInput")
+      .addEventListener("keydown", function(event) {
 
-    header h1 {
-      font-size: 28px;
-    }
+        if (event.key === "Enter") {
+          searchAnime();
+        }
 
-    header p {
-      margin-top: 6px;
-      opacity: .8;
-    }
+      });
 
-    .categories {
-      display: flex;
-      gap: 10px;
-      padding: 15px;
-      overflow-x: auto;
-    }
-
-    .categories button {
-      border: none;
-      padding: 10px 16px;
-      border-radius: 20px;
-      background: #191d35;
-      color: white;
-      white-space: nowrap;
-    }
-
-    .categories button.active {
-      background: linear-gradient(90deg, #6c35ff, #d12cff);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      padding: 15px;
-    }
-
-    .wallpaper {
-      position: relative;
-      height: 230px;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #15182a;
-    }
-
-    .wallpaper img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .download {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      width: 42px;
-      height: 42px;
-      border: none;
-      border-radius: 50%;
-      background: #7b3cff;
-      color: white;
-      font-size: 20px;
-    }
-
-    .empty {
-      text-align: center;
-      padding: 40px 20px;
-      opacity: .7;
-    }
-  </style>
-</head>
-
-<body>
-
-  <header>
-    <h1>🌌 Wallpaper App</h1>
-    <p>HD Anime Wallpapers</p>
-  </header>
-
-  <div class="categories">
-    <button class="active">🔥 Popular</button>
-    <button>Anime</button>
-    <button>🌌 Landscape</button>
-    <button>🌃 Cyberpunk</button>
-  </div>
-
-  <div class="grid">
-
-    <div class="wallpaper">
-      <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=600&q=80">
-      <button class="download" onclick="downloadImage(this)">↓</button>
-    </div>
-
-    <div class="wallpaper">
-      <img src="https://images.unsplash.com/photo-1534791547706-1b1f8f8f8b7a?auto=format&fit=crop&w=600&q=80">
-      <button class="download" onclick="downloadImage(this)">↓</button>
-    </div>
-
-    <div class="wallpaper">
-      <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=600&q=80">
-      <button class="download" onclick="downloadImage(this)">↓</button>
-    </div>
-
-    <div class="wallpaper">
-      <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=600&q=80">
-      <button class="download" onclick="downloadImage(this)">↓</button>
-    </div>
-
-  </div>
-
-  <script>
-    const tg = window.Telegram.WebApp;
-
-    tg.ready();
-    tg.expand();
-
-    function downloadImage(button) {
-      const img = button.parentElement.querySelector("img");
-      window.open(img.src, "_blank");
-    }
+    loadWallpapers("popular");
   </script>
 
 </body>
