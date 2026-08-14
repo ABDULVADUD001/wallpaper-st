@@ -1,54 +1,69 @@
-<script>
-  async function loadWallpapers() {
-    const status = document.getElementById("status");
-    const grid = document.getElementById("grid");
-    
-    grid.innerHTML = "";
-    status.textContent = "Rasmlar yuklanmoqda...";
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime Wallpaper</title>
 
-    // URL ni qo‘shtirnoq ichiga oldik
-    let url = "https://api.waifu.im/search?is_nsfw=false&limit=30";
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("API xatosi");
-
-      const data = await response.json();
-
-      if (!data.images || data.images.length === 0) {
-        status.textContent = "😕 Rasm topilmadi.";
-        return;
-      }
-
-      status.textContent = "✨ " + data.images.length + " ta wallpaper";
-
-      data.images.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "wallpaper";
-
-        const img = document.createElement("img");
-        img.src = item.url;
-        img.loading = "lazy";
-        img.alt = "Anime Wallpaper";
-
-        const download = document.createElement("button");
-        download.className = "download";
-        download.textContent = "↓";
-
-        download.onclick = () => {
-          window.open(item.url, "_blank");
-        };
-
-        card.appendChild(img);
-        card.appendChild(download);
-        grid.appendChild(card);
-      });
-
-    } catch (error) {
-      console.error(error);
-      status.textContent = "❌ Rasmlarni yuklashda xatolik yuz berdi.";
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #101426;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
     }
-  }
 
-  loadWallpapers();
-</script>
+    .box {
+      padding: 30px;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    p {
+      color: #aaa;
+    }
+
+    button {
+      border: 0;
+      padding: 14px 25px;
+      border-radius: 12px;
+      background: #713cff;
+      color: white;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+    <h1>🌌 Anime Wallpaper</h1>
+    <p>Mini App muvaffaqiyatli ochildi! ✅</p>
+
+    <button onclick="test()">
+      🔥 Test
+    </button>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+
+    tg.ready();
+    tg.expand();
+
+    function test() {
+      tg.showAlert("Mini App ishlayapti! ✅");
+    }
+  </script>
+
+</body>
+</html>
